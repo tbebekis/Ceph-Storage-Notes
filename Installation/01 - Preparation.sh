@@ -1,6 +1,9 @@
 # ● on the manager host
 # ---------------------------------------------------------------------------------
 # this host is going to be the host where the first Monitor daemon is installed
+#
+# CRUCIAL: Clock synchronization needs to be set on all nodes,
+# so chrony must be installed and configured properly in all Ceph hosts.
  
 # Variables
 # Quincy version. Replace this with the desired release 
