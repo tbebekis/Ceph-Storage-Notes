@@ -3,6 +3,7 @@
 # ---------------------------------------------------------------------------------
 
 # https://docs.ceph.com/en/latest/cephadm/services/osd/#advanced-osd-service-specifications
+# https://access.redhat.com/documentation/en-us/red_hat_ceph_storage/7/html-single/operations_guide/index#deploying-ceph-osds-using-advanced-service-specifications_ops
 
 # Service Specifications of type "osd" are a way to describe a cluster layout, using the properties of disks. 
 # Service specifications give the user an abstract way to tell Ceph which disks should turn into OSDs with which configurations, 
