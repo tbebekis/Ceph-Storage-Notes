@@ -1,0 +1,87 @@
+ ● Block Devices (RBD): 
+   The Ceph Block Device (a.k.a., RBD) service provides resizable, 
+   thin-provisioned block devices that can be snapshotted and cloned. 
+   Ceph stripes a block device across the cluster for high performance. 
+   Ceph supports both kernel objects (KO) and a QEMU hypervisor 
+   that uses librbd directly--avoiding the kernel object overhead for virtualized systems.
+
+ ● Object Storage (RGW): 
+   The Ceph Object Storage (a.k.a., RGW) service provides RESTful APIs 
+   with interfaces that are compatible with Amazon S3 and OpenStack Swift.
+
+ ● Filesystem (CephFS): 
+   The Ceph File System (CephFS) service provides a POSIX compliant filesystem 
+   usable with mount or as a filesystem in user space (FUSE).
+
+https://docs.ceph.com/en/latest/architecture/#ceph-clients   
+---------------------------------------------------------------------------------------
+
+ ● librados 
+   A C++ library and an API. There are bindings for Java, C, Python and PHP
+   A Ceph Client uses librados to interact directly with OSDs in order to store and retrieve data. 
+
+ ● RADOS
+    Reliable Autonomic Distributed Object Store. 
+    RADOS is the object store that provides a scalable service for variably-sized objects. 
+    The RADOS object store is the core component of a Ceph cluster.    
+
+ ● Ceph Block Device
+ ● RADOS Block Device
+ ● RBD
+    Also called “RADOS Block Device” and RBD. 
+    A software instrument that orchestrates the storage of block-based data in Ceph. 
+    Ceph Block Device splits block-based application data into “chunks”. 
+    RADOS stores these chunks as objects. 
+    Ceph Block Device orchestrates the storage of those objects across the storage cluster.    
+
+ ● RGW
+    RADOS Gateway. Also called “Ceph Object Gateway”. 
+    The component of Ceph that provides a gateway to both the Amazon S3 RESTful API and the OpenStack Swift API.
+
+ ● Ceph OSD
+    Ceph Object Storage Daemon. The Ceph OSD software, which interacts with logical disks (OSD). 
+
+ ● OSD
+    “OSD” means “Object Storage Device”, which refers to a physical or logical storage unit (for example: LUN)
+
+ ● Bucket
+    In the context of RGW, a bucket is a group of objects. 
+    In a filesystem-based analogy in which objects are the counterpart of files, buckets are the counterpart of directories.
+
+ ● BlueStore
+    OSD BlueStore is a storage back end (the default) used by OSD daemons, and was designed specifically for use with Ceph. 
+    BlueStore stores objects directly on raw block devices or partitions, 
+    and does not interact with mounted file systems. 
+    BlueStore uses RocksDB’s key/value database to map object names to block locations on disk.
+    Ceph does not rely on any other conventional filesystem and directly manages HDDs and SSDs 
+    with its own storage backend BlueStore
+
+ ● CephFS
+    The Ceph File System, or CephFS, is a POSIX-compliant file system built on top of Ceph’s distributed object store, RADOS.  
+
+ ● Realm
+    In the context of RADOS Gateway (RGW), a realm is a globally unique namespace that consists of one or more zonegroups.
+
+ ● MDS
+    The Ceph MetaData Server daemon. Also referred to as “ceph-mds”.     
+
+ ● CRUSH
+    Controlled Replication Under Scalable Hashing. The algorithm that Ceph uses to compute object storage locations    
+
+ ● Placement Groups (PGs)
+    Placement groups (PGs) are subsets of each logical Ceph pool. 
+    Placement groups perform the function of placing objects (as a group) into OSDs. 
+    Ceph manages data internally at placement-group granularity: this scales better 
+    than would managing individual (and therefore more numerous) RADOS objects. 
+    A cluster that has a larger number of placement groups (for example, 100 per OSD) 
+    is better balanced than an otherwise identical cluster with a smaller number of placement groups.
+
+    Ceph’s internal RADOS objects are each mapped to a specific placement group, 
+    and each placement group belongs to exactly one Ceph pool.
+
+ ● Pool
+    A pool is a logical partition used to store objects.
+    Each pool has a number of placement groups (PGs) within it. 
+ 
+
+

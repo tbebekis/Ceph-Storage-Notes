@@ -1,0 +1,44 @@
+# ---------------------------------------------------
+# A. create a cache
+# ---------------------------------------------------
+
+# 1. associate a backing pool to a cache pool
+ceph osd tier add BACK_POOL CACHE_POOL
+
+# 2. set the cache mode of the pool
+# "writeback" is the cache mode
+ceph osd tier cache-mode CACHE_POOL writeback
+
+# 3. establish a client redirection from backing pool to the cache pool
+ceph osd tier set-overlay BACK_POOL CACHE_POOL
+
+# ---------------------------------------------------
+# B. configure a cache
+# ---------------------------------------------------
+
+# further configuration of a cache pool is done by KEY = VALUE settings
+# SEE: https://docs.ceph.com/en/latest/rados/operations/pools
+ceph osd pool set CACHE_POOL KEY VALUE
+
+
+# ---------------------------------------------------
+# C. remove a "writeback" cache pool
+# ---------------------------------------------------
+
+# CAUTION: caution needed when removing a "writeback" pool
+# SEE: https://docs.ceph.com/en/latest/rados/operations/cache-tiering/#removing-a-writeback-cache
+
+# 1. set mode to proxy
+ceph osd tier cache-mode CACHE_POOL proxy
+
+# 2. check if there are objects in the cache
+rados -p CACHE_POOL ls
+
+# 3. if there are objects in the cache, remove them manually
+rados -p CACHE_POOL cache-flush-evict-all
+
+# 4. remove the redirection of clients 
+ceph osd tier remove-overlay BACK_POOL
+
+# 5. remove the association between the pools
+ceph osd tier remove BACK_POOL CACHE_POOL

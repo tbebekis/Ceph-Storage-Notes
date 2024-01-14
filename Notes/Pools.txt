@@ -1,0 +1,55 @@
+By default, Ceph pools are created with the type “replicated”. 
+In replicated-type pools, every object is copied to multiple disks. 
+This multiple copying is the method of data protection known as “replication”.
+
+By contrast, erasure-codedpools use a method of data protection that is different from replication. 
+In erasure coding, data is broken into fragments of two kinds: data blocks and parity blocks. 
+If a drive fails or becomes corrupted, the parity blocks are used to rebuild the data. 
+At scale, erasure coding saves space relative to replication.
+
+https://docs.ceph.com/en/latest/rados/operations/pools/
+https://docs.ceph.com/en/latest/rados/operations/erasure-code/
+---------------------------------------------------------------------------------------
+Data copies
+
+In a replicated storage pool, Ceph needs multiple copies of an object to operate in a degraded state. 
+Ideally, a Ceph storage cluster enables a client to read and write data 
+even if one of the OSDs in an acting set fails. 
+For this reason, Ceph defaults to making three copies of an object 
+with a minimum of two copies clean for write operations. 
+Ceph will still preserve data even if two OSDs fail. 
+However, it will interrupt write operations.
+
+In an erasure-coded pool, Ceph needs to store chunks of an object across multiple OSDs 
+so that it can operate in a degraded state. 
+Similar to replicated pools, ideally an erasure-coded pool enables a Ceph client 
+to read and write in a degraded state. 
+
+https://access.redhat.com/documentation/en-us/red_hat_ceph_storage/7/html-single/architecture_guide/index#ceph-replication_arch
+---------------------------------------------------------------------------------------
+Ceph supports two types of Pools
+
+ ● Replicated (the default)
+ceph osd pool create {pool-name} [{pg-num} [{pgp-num}]] [replicated] \
+         [crush-rule-name] [expected-num-objects]
+
+Ceph, by default, stores 3 copies of an object.
+Each copy is writen in a different OSD.
+It allows writing when at least 2 copies (OSDs) are ok.
+
+The replicated pools require more raw storage 
+but can implement all Ceph operations.
+
+ ● Erasure Coding
+
+ceph osd pool create {pool-name} [{pg-num} [{pgp-num}]]   erasure \
+         [erasure-code-profile] [crush-rule-name] [expected_num_objects] [--autoscale-mode=<on,off,warn>]
+
+Ceph stores chunks of an object across multiple OSDs.
+The erasure pools require less raw storage 
+but can perform only some Ceph tasks and may provide decreased performance.
+
+SEE: https://en.wikipedia.org/wiki/Erasure_code
+
+-------------------------------
+We (should) use Replicated Pools only.
