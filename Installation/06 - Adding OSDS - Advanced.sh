@@ -98,6 +98,20 @@ spec:
     - /dev/sdd
 
 
+# ● osds_per_device setting
+# --------------------------------------------------------------------------------- 
+# SEE: https://docs.ceph.com/en/quincy/cephadm/services/osd/#additional-options
+# Number of osd daemons per “DATA” device. To fully utilize nvme devices multiple osds are required. 
+# Can be used to split dual-actuator devices across 2 OSDs, by setting the option to 2.
 
-
-
+# so we may use
+service_type: osd
+service_id: osd_spec_default
+placement:
+  host_pattern: '*'
+spec:
+  data_devices:
+    rotational: 1
+  db_devices:
+    rotational: 0
+osds_per_device: 2
