@@ -1,0 +1,30 @@
+service_type: host
+hostname: node-00
+addr: 192.168.0.10
+labels:
+- example1
+- example2
+---
+service_type: host
+hostname: node-01
+addr: 192.168.0.11
+labels:
+- grafana
+---
+service_type: host
+hostname: node-02
+addr: 192.168.0.12
+---
+service_type: mon
+placement:
+  host_pattern: "host[0-2]"
+---
+service_type: osd
+service_id: osd_spec_default
+placement:
+  host_pattern: '*'
+spec:
+  data_devices:
+    rotational: 1
+  db_devices:
+    rotational: 0  

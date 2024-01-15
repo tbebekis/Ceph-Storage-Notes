@@ -4,6 +4,7 @@
 
 # https://docs.ceph.com/en/latest/cephadm/services/osd/#advanced-osd-service-specifications
 # https://access.redhat.com/documentation/en-us/red_hat_ceph_storage/7/html-single/operations_guide/index#deploying-ceph-osds-using-advanced-service-specifications_ops
+# https://access.redhat.com/documentation/en-us/red_hat_ceph_storage/7/html-single/operations_guide/index#advanced-service-specifications-and-filters-for-deploying-osds_ops
 
 # Service Specifications of type "osd" are a way to describe a cluster layout, using the properties of disks. 
 # Service specifications give the user an abstract way to tell Ceph which disks should turn into OSDs with which configurations, 
@@ -23,7 +24,6 @@
 # --------------------------------------------------------------------------------- 
 
 # file: osd_spec.yml
-
 service_type: osd
 service_id: default_drive_group  # custom name of the osd spec
 placement:
@@ -31,6 +31,9 @@ placement:
 spec:
   data_devices:                  # the type of devices you are applying specs to
     all: true                    # a filter, check below for a full list
+
+# mount the spec file
+cephadm shell --mount osd_spec.yaml:/path/to/osd_spec.yml
 
 # apply the YAML file
 ceph orch apply -i /path/to/osd_spec.yml

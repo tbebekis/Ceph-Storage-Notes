@@ -1,13 +1,10 @@
+# ● clock synchronization
+# ---------------------------------------------------------------------------------
+# CRUCIAL: Clock synchronization (such as chrony or NTP) needs to be set on all nodes.
+
 # ● on the manager host
 # ---------------------------------------------------------------------------------
-# this host is going to be the host where the first Monitor daemon is installed
-#
-# CRUCIAL: Clock synchronization needs to be set on all nodes,
-# so chrony must be installed and configured properly in all Ceph hosts.
- 
-# Variables
-# Quincy version. Replace this with the desired release 
-CEPH_RELEASE=quincy
+# this host is going to be the host where the first Ceph Monitor daemon is installed
 
 # ● update and upgrade
 # ---------------------------------------------------------------------------------
@@ -19,8 +16,14 @@ dnf upgrade -y
 apt-get update
 apt-get upgrade
 
-# ● install prerequisites
+# ● install prerequisites on any Ceph host
 # ---------------------------------------------------------------------------------
+# - Python 3
+# - Systemd
+# - Podman or Docker for running containers
+# - Time synchronization (such as chrony or NTP)
+# - LVM2 for provisioning storage devices
+
 # RH/CentOS
 dnf install -y python3 
 dnf install -y lvm2 
@@ -38,6 +41,8 @@ cat /etc/hosts
 
 # ● set hostname on Ceph hosts
 # ---------------------------------------------------------------------------------
+# we are going to use the cephadm tool in installing the Ceph cluster.
+# cephadm demands that the name of the host given via ceph orch host add equals the output of hostname on remote hosts.
 ssh HOST-0 hostname HOST-0
 ssh HOST-1 hostname HOST-1
 ssh HOST-2 hostname HOST-2
@@ -63,37 +68,3 @@ podman -v
 pvcreate --version
 vgcreate --version
 lvcreate --version
-
-# ● IF
-# a package is available for the OS, install cephadm using that package
-# ---------------------------------------------------------------------------------
-# RH/CentOS 
-dnf search release-ceph
-dnf install --assumeyes centos-release-ceph-${CEPH_RELEASE}
-dnf install --assumeyes cephadm
-
-# Ubuntu 
-apt-get install -y cephadm
-
-# ● ELSE 
-# download and install cephadm
-# ---------------------------------------------------------------------------------        
-curl --silent --remote-name --location https://github.com/ceph/ceph/raw/${CEPH_RELEASE}/src/cephadm/cephadm
-
-# make the cephadm script executable
-chmod +x cephadm              
-
-# install cephadm as Linux command
-./cephadm add-repo --release ${CEPH_RELEASE}
-./cephadm install
-
-# check where it is installed, it should be in /usr/sbin/cephadm
-which cephadm
-
-# ● install ceph-common
-# ---------------------------------------------------------------------------------
-# RH/CentOS
-dnf install -y ceph-common  
-
-# Ubuntu 
-apt-get install -y ceph-common  

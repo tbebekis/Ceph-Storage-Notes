@@ -89,10 +89,7 @@ ceph orch daemon add osd host1:data_devices=/dev/sda,/dev/sdb,db_devices=/dev/sd
 # NOTE: If you have separate DB or WAL devices, the ratio of block to DB or WAL devices MUST be 1:1.    // ?????
 # QUESTION: what do they mean by "raw"
 ceph orch daemon add osd --method raw host02:/dev/sdb
-
-
-
-
+ 
 # ● DRY RUN flag
 # --------------------------------------------------------------------------------- 
 # The --dry-run flag causes the orchestrator to present a preview of what will happen without actually creating the OSDs.
@@ -111,20 +108,6 @@ all-available-devices node3 /dev/vdd  -   -
 ceph orch ls osd                    # list the service
 ceph osd tree                       # view details
 ceph orch ps --service_name=osd     # list hosts, daemons, and processes
-
-
-
-# ● PLEASE review the following link
-# --------------------------------------------------------------------------------- 
-# SEE: https://access.redhat.com/documentation/en-us/red_hat_ceph_storage/7/html-single/operations_guide/index#advanced-service-specifications-and-filters-for-deploying-osds_ops
-#
-# The "db_devices" and "wal_devices" are flags used for devices designated to store Journal and Log data
-# like our own NVMe disks.
-# 
-# The "data_devices" flag is used for normal OSD disks.
-
-# SEE: https://people.redhat.com/bhubbard/nature/default/mgr/orchestrator_modules/#ceph.deployment.drive_group.DeviceSelection.all
-
 
 # ● remove an OSD
 # --------------------------------------------------------------------------------- 
