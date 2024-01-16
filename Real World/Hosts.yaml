@@ -1,0 +1,27 @@
+service_type: host
+hostname: ceph-01
+addr: 10.80.80.81
+labels:
+  - _admin
+---
+service_type: host
+hostname: ceph-02
+addr: 10.80.80.82
+---
+service_type: host
+hostname: ceph-03
+addr: 10.80.80.83
+---
+service_type: host
+hostname: ceph-04
+addr: 10.80.80.84
+labels:
+  - _admin
+---
+service_type: host
+hostname: ceph-05
+addr: 10.80.80.85
+---
+service_type: host
+hostname: ceph-06
+addr: 10.80.80.86

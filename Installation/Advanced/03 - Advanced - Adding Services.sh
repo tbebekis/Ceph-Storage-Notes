@@ -7,7 +7,8 @@
 # --------------------------------------------------------------------------------- 
 # SYNTAX: ceph orch ls [--service_type type] [--service_name name] [--export] [--format f] [--refresh]
 # --service_type : a Ceph service (mon, crash, mds, mgr, osd or rbd-mirror), 
-#                  a gateway (nfs or rgw), part of the monitoring stack (alertmanager, grafana, node-exporter or prometheus) 
+#                  a gateway (nfs or rgw), 
+#                  part of the monitoring stack (alertmanager, grafana, node-exporter or prometheus) 
 #                  or (container) for custom containers
 # --service_name : not sure, perhaps the service_id as it is passed with the specs YAML file.
 # --export       : exports service specification in a YAML file and that yaml can be used with the "ceph orch apply -i" command
@@ -73,6 +74,8 @@ ceph config set <service-name> <param> <value>
 # export the running Service Specification.
 ceph orch ls --export > cluster.yaml
 
+# ● re-apply the Service Specification
+# --------------------------------------------------------------------------------- 
 # The Specification can then be changed and re-applied
 ceph orch apply -i cluster.yaml
 

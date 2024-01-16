@@ -1,0 +1,39 @@
+service_type: mon
+service_id: mon
+placement:
+  host_pattern: '*'
+---
+service_type: mgr
+service_id: mgr
+placement:
+  count: 3
+---
+service_type: mds
+service_id: mds
+placement:
+  count: 3
+---
+service_type: crash
+service_name: crash
+placement:
+  host_pattern: '*'
+---
+service_type: prometheus
+service_id: prometheus
+placement:
+  count: 2
+---
+service_type: grafana
+service_id: grafana
+placement:
+  count: 2
+---
+service_type: alertmanager
+service_id: alertmanager
+placement:
+  count: 3
+---
+service_type: node-exporter
+service_id: node-exporter
+placement:
+  host_pattern: '*'  
