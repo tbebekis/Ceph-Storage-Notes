@@ -1,0 +1,9 @@
+- name: Cluster Installation
+  hosts: admin
+  gather_facts: false
+  vars:
+    MONITOR_IP: 10.80.80.81
+    CLUSTER_NETWORK_CIDR: 10.80.80.0/24
+  tasks:
+  - name: Executing Bootstrap Operation
+    shell: cephadm bootstrap --mon-ip {{ MONITOR_IP }} --cluster-network {{ CLUSTER_NETWORK_CIDR }} --apply-spec cluster_spec.yml

@@ -1,0 +1,7 @@
+- name: Remove All Hosts
+  hosts: admin
+  gather_facts: false
+  tasks:
+  - name: Removing a Host
+    shell: ceph orch host rm "{{ item }}" --force
+    loop: "{{ groups[all] }}"

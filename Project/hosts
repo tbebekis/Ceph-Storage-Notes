@@ -1,0 +1,18 @@
+[admin]
+ceph-01 ansible_host=10.80.80.81
+
+[other]
+ceph-02 ansible_host=10.80.80.82
+ceph-03 ansible_host=10.80.80.83
+ceph-04 ansible_host=10.80.80.84
+ceph-05 ansible_host=10.80.80.85
+ceph-06 ansible_host=10.80.80.86
+
+[all]
+ceph-01 ansible_host=10.80.80.81
+ceph-02 ansible_host=10.80.80.82
+ceph-03 ansible_host=10.80.80.83
+ceph-04 ansible_host=10.80.80.84
+ceph-05 ansible_host=10.80.80.85
+ceph-06 ansible_host=10.80.80.86
+

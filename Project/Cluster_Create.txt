@@ -1,0 +1,51 @@
+=======================================================================================
+                                Create a Ceph Cluster
+=======================================================================================
+Requires 2 steps
+
+---------------------------------------------------------------------------------------
+ ● Preparation
+---------------------------------------------------------------------------------------
+ansible-playbook preparation.yml
+
+The above Playbook just install some prerequisites to all hosts
+
+      apt-get install -y python3
+      apt-get install -y lvm2
+      apt-get install -y podman
+      apt-get install -y cephadm
+      apt-get install -y ceph-common
+
+It's not elegant, in that it does not check if any of these packages is already installed.
+We should replace these lines with a prerequisites.sh file
+which checks whether a package is installed, before installing it.
+
+Example
+
+- name: Transfer and execute a script.
+  hosts: all
+  tasks:
+
+     - name: Copy and Execute the script 
+       script: /home/user/prerequisites.sh
+
+---------------------------------------------------------------------------------------
+ ● Create cluster
+---------------------------------------------------------------------------------------
+ansible-playbook cluster_bootstrap.yml
+
+ There are 2 variables in this YAML file
+
+  vars:
+    MONITOR_IP: 10.80.80.81
+    CLUSTER_NETWORK_CIDR: 10.80.80.0/24
+
+We should check these values, before executing the file, just to be sure they are the correct ones. 
+
+The file calls
+    cephadm bootstrap --mon-ip {{ MONITOR_IP }} --cluster-network {{ CLUSTER_NETWORK_CIDR }} --apply-spec cluster_spec.yml
+passing the 
+    cluster_spec.yml
+to the --apply-spec option.
+
+The cluster_spec.yml creates the whole cluster, i.e. hosts, OSDs and services.

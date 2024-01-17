@@ -1,0 +1,11 @@
+- name: Preparation
+  hosts: all
+  tasks:
+  - name: Install Prerequisites
+    shell: |
+      apt-get install -y python3
+      apt-get install -y lvm2
+      apt-get install -y podman
+      apt-get install -y cephadm
+      apt-get install -y ceph-common
+      exit 0

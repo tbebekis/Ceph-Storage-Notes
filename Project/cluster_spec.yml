@@ -1,0 +1,77 @@
+service_type: host
+hostname: ceph-01
+addr: 10.80.80.81
+labels:
+  - _admin
+---
+service_type: host
+hostname: ceph-02
+addr: 10.80.80.82
+---
+service_type: host
+hostname: ceph-03
+addr: 10.80.80.83
+---
+service_type: host
+hostname: ceph-04
+addr: 10.80.80.84
+labels:
+  - _admin
+---
+service_type: host
+hostname: ceph-05
+addr: 10.80.80.85
+---
+service_type: host
+hostname: ceph-06
+addr: 10.80.80.86
+---
+service_type: osd
+service_id: osd_spec_default
+placement:
+  host_pattern: '*'
+spec:
+  data_devices:
+    rotational: 1
+  db_devices:
+    rotational: 0
+---
+service_type: mon
+service_id: mon
+placement:
+  host_pattern: '*'
+---
+service_type: mgr
+service_id: mgr
+placement:
+  count: 3
+---
+service_type: mds
+service_id: mds
+placement:
+  count: 3
+---
+service_type: crash
+service_name: crash
+placement:
+  host_pattern: '*'
+---
+service_type: prometheus
+service_id: prometheus
+placement:
+  count: 2
+---
+service_type: grafana
+service_id: grafana
+placement:
+  count: 2
+---
+service_type: alertmanager
+service_id: alertmanager
+placement:
+  count: 3
+---
+service_type: node-exporter
+service_id: node-exporter
+placement:
+  host_pattern: '*'  

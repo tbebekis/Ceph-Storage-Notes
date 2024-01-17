@@ -1,0 +1,24 @@
+- name: Drain All Hosts
+  hosts: admin
+  gather_facts: false  
+
+  tasks:
+
+  - name: Draining Hosts
+    shell: ceph orch host drain "{{ item }}" --zap-osd-devices
+    loop: "{{ groups[all] }}"
+
+  - name: Checking whether any daemons are still running on hosts
+    shell: ceph orch ps "{{ item }}"
+    register: Drain_Result
+    until: Drain_Result.stdout.find("No daemons reported") != -1
+    retries: 10
+    delay: 10
+    loop: "{{ groups[all] }}"
+
+  - name: Checking OSD removal status
+    shell: ceph orch osd rm status
+    register: OSD_Removal_Result
+    until: OSD_Removal_Result.stdout.find("No OSD remove/replace operations reported") != -1
+    retries: 10
+    delay: 10

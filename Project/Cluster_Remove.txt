@@ -1,0 +1,30 @@
+=======================================================================================
+                                Remove a Ceph Cluster
+=======================================================================================
+Requires 3 steps
+
+---------------------------------------------------------------------------------------
+ ● Drain hosts
+---------------------------------------------------------------------------------------
+ansible-playbook hosts_drain.yml
+
+The above Playbook tries to be sure that 
+- no daemons are running on any host
+- the OSD removal operation has finished
+
+To be sure about the two above conditions, before proceeding to the next step,
+we may execute on the Admin host
+
+    ceph orch ps HOST_NAME
+    ceph orch osd rm status
+
+---------------------------------------------------------------------------------------
+ ● Remove hosts
+---------------------------------------------------------------------------------------
+ansible-playbook hosts_remove.yml
+
+---------------------------------------------------------------------------------------
+ ● Remove Cluster
+---------------------------------------------------------------------------------------
+ansible-playbook cluster_remove.yml
+

@@ -1,0 +1,19 @@
+# this file contains 2 Plays
+
+- name: Disable cephadm
+  hosts: admin
+  gather_facts: false
+  tasks:
+    - name: Disabling cephadm to stop all the orchestration operations to avoid deploying new daemons
+      shell: ceph mgr module disable cephadm
+
+- name: Remove Cluster
+  hosts: all
+  gather_facts: false
+  tasks:
+  - name: Getting FSID
+    shell: ceph fsid
+    register: FSID
+  - name: Removing Cluster on All Hosts
+    shell: cephadm rm-cluster --fsid {{ FSID }} --force --zap-osds
+ 
