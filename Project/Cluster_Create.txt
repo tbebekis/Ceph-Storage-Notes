@@ -8,17 +8,14 @@ Requires 2 steps
 ---------------------------------------------------------------------------------------
 ansible-playbook preparation.yml
 
-The above Playbook just install some prerequisites to all hosts
+The above Playbook installσ some prerequisites to all hosts and finally installs 
+cephadm and ceph-common
 
-      apt-get install -y python3
-      apt-get install -y lvm2
-      apt-get install -y podman
-      apt-get install -y cephadm
-      apt-get install -y ceph-common
+It contains a variable which denotes the Ceph version. Currently is set to "quincy"
 
-It's not elegant, in that it does not check if any of these packages is already installed.
-We should replace these lines with a prerequisites.sh file
-which checks whether a package is installed, before installing it.
+We may replace the Tasks of this Playbook with a prerequisites.sh file
+for better controlling the installation procedure, 
+and then call that prerequisites.sh in a Task.
 
 Example
 

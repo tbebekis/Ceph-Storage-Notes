@@ -1,11 +1,54 @@
 - name: Preparation
   hosts: all
   tasks:
-  - name: Install Prerequisites
+
+  # Python
+  - name: Cecking Python3
+    shell: python3 --version
+    register: Python_Result
+  - name: Displaying Python Result
+    debug:
+      var: Python_Result
+  - name: Installing Python
+    shell: apt-get install -y python3
+    when: Python_Result.stdout.find("Python 3") == -1 
+
+  # lvm2
+  - name: Cecking lvm2
+    shell: lvm version
+    register: LVM_Result
+  - name: Displaying lvm2 Result
+    debug:
+      var: LVM_Result
+  - name: Installing lvm2
+    shell: apt-get install -y lvm2
+    when: LVM_Result.stdout.find("LVM version") == -1
+
+  # Podman
+  - name: Cecking Podman
+    shell: podman -v
+    register: Podman_Result
+  - name: Displaying Podman Result
+    debug:
+      var: Podman_Result
+  - name: Installing Podman
+    shell: apt-get install -y podman
+    when: Podman_Result.stdout.find("not found") != -1 
+
+  # cephadm and ceph-common
+  - name: Checking cephadm
+    shell: which cephadm
+    register: cephadm_Result
+  - name: Displaying cephadm Result
+    debug:
+      var: cephadm_Result
+  - name: Installing cephadm and ceph-common
+    vars:
+      CEPH_RELEASE: quincy
     shell: |
-      apt-get install -y python3
-      apt-get install -y lvm2
-      apt-get install -y podman
-      apt-get install -y cephadm
-      apt-get install -y ceph-common
-      exit 0
+      curl --silent --remote-name --location https://github.com/ceph/ceph/raw/{{ CEPH_RELEASE }}/src/cephadm/cephadm
+      chmod +x cephadm              
+      ./cephadm add-repo --release {{ CEPH_RELEASE }}
+      ./cephadm install
+      ./cephadm install ceph-common
+    when: cephadm_Result.stdout.find("/usr/sbin/cephadm") == -1

@@ -1,0 +1,22 @@
+#-----------------------------------------------------------------------------------
+#                     AntyxSoft (tbebekis@antyxsoft.com)
+#-----------------------------------------------------------------------------------
+
+---
+# a variables file can have any name, e.g. myvars.yml
+# it can be loaded from inside a playbook as following 
+# - hosts: all
+#   vars_files:
+#     - /vars/external_vars.yml
+
+var1: value1
+var2: value2
+
+# variables can also be passed in the command line, e.g.
+#   ansible-playbook my_playbook.yml --extra-vars "var1=value1 var2=value2"
+#
+# There is also the include_vars modules which can be used to load
+# variables from a single file or a directory
+# SEE: https://docs.ansible.com/ansible/latest/modules/include_vars_module.html
+
+ 
