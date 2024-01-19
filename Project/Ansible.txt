@@ -1,0 +1,16 @@
+Due to file security demands by Ansible, the following files
+    ansible.cfg
+    hosts
+moved to
+    Ceph-Storage-Notes/Ansible
+while Playbooks are in
+    Ceph-Storage-Notes/Project
+
+So in order to run a Playbook, execute the following
+    cd /_Dev/Ceph-Storage-Notes/Ansible
+    ansible-playbook ../Project/test.yml --ask-pass
+
+If for any reason SSH Keys don't work, then use
+    ansible-playbook ../Project/test.yml --ask-pass
+
+
