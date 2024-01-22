@@ -15,8 +15,9 @@
 #   - output displays the Dashboard URL and Credentials to access it.
 
 # Variables
-MONITOR_IP=192.168.1.23                     # the IP of the local host 
-CLUSTER_NETWORK_CIDR=192.168.1.0/24         # the cluster network
+MONITOR_IP=10.80.80.81                    # the IP of the local host 
+CLUSTER_NETWORK_CIDR=10.80.80.0/24         # the cluster network
+
 
 # execute the bootstrap operation
 cephadm bootstrap --mon-ip ${MONITOR_IP} --cluster-network ${CLUSTER_NETWORK_CIDR}

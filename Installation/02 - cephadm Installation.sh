@@ -37,7 +37,8 @@ apt-get install -y cephadm
 # ● curl-based installation 
 # ELSE use curl to download cephadm and then install it
 # ---------------------------------------------------------------------------------        
-curl --silent --remote-name --location https://github.com/ceph/ceph/raw/${CEPH_RELEASE}/src/cephadm/cephadm
+
+curl --silent --remote-name --location https://github.com/ceph/ceph/tree/${CEPH_RELEASE}/src/cephadm/cephadm
 
 # make the cephadm script executable
 chmod +x cephadm              
