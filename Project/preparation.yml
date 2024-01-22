@@ -28,6 +28,7 @@
   - name: Cecking Podman
     shell: podman -v
     register: Podman_Result
+    ignore_errors: yes 
   - name: Displaying Podman Result
     debug:
       var: Podman_Result
@@ -46,7 +47,8 @@
     vars:
       CEPH_RELEASE: quincy
     shell: |
-      curl --silent --remote-name --location https://github.com/ceph/ceph/raw/{{ CEPH_RELEASE }}/src/cephadm/cephadm
+      curl --silent --remote-name --location https://github.com/ceph/ceph/tree/${CEPH_RELEASE}/src/cephadm/cephadm
+
       chmod +x cephadm              
       ./cephadm add-repo --release {{ CEPH_RELEASE }}
       ./cephadm install
