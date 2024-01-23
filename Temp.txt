@@ -1,0 +1,40 @@
+  - name: Checking /tmp/cephadm folder
+    stat: 
+      path: "{{ TEMP_CEPHADM_FOLDER }}"
+    register: cephadm_temp_folder_Result
+    when: (cephadm_Result.stdout.find("not found") != -1)
+  - name: Creating /tmp/cephadm folder (if not exists)
+    file: 
+      path: "{{ TEMP_CEPHADM_FOLDER }}"
+      state: directory
+      mode: '0755'
+
+
+  - name: Installing cephadm
+    shell: |
+      curl --silent --remote-name --location https://github.com/ceph/ceph/tree/{{ CEPH_RELEASE }}/src/cephadm/cephadm  
+
+      chmod +x cephadm       
+
+      ./cephadm add-repo --release {{ CEPH_RELEASE }}  
+
+      ./cephadm install ceph-common  
+
+      ./cephadm install  
+    when: cephadm_Result.stdout.find("/usr/sbin/cephadm") == -1
+
+  # Ceph
+  - name: Cecking Ceph
+    shell: ceph -v
+    register: Ceph_Result
+    ignore_errors: true
+  - name: Displaying Ceph Result
+    debug:
+      var: Ceph_Result
+  - name: Installing Ceph
+    shell: |
+      wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
+      apt-get update
+      apt-get install -y ceph ceph-mds
+      ceph -v
+    when: (Ceph_Result is failed) or cephadm_Result.stdout.find("/usr/sbin/cephadm") == -1

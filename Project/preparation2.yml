@@ -1,0 +1,48 @@
+- name: Preparation
+  hosts: test
+  vars:
+    CEPH_RELEASE: quincy  
+    TEMP_CEPHADM_FOLDER: /tmp/cephadm
+  gather_facts: false
+  tasks:
+
+  - name: Creating /tmp/cephadm folder (if not exists)
+    file: 
+      path: "{{ TEMP_CEPHADM_FOLDER }}"
+      state: directory
+      mode: '0755'
+
+  - name: Checking if cephadm is already downloaded
+    stat: 
+      path: "{{ TEMP_CEPHADM_FOLDER }}/cephadm"
+    register: cephadm_Download_Result
+
+  - name: Downloading cephadm (if not already downloaded)
+    get_url:
+      url: https://raw.githubusercontent.com/ceph/ceph/{{ CEPH_RELEASE }}/src/cephadm/cephadm
+      dest: "{{ TEMP_CEPHADM_FOLDER }}/cephadm"
+      mode: '0755'
+    when: not cephadm_Download_Result.stat.exists     
+
+  # cephadm, ceph-common
+  # the "cephadm version" has a bug, SEE: https://tracker.ceph.com/issues/59428
+  # so we use the location /usr/sbin/cephadm to check if cephadm is installed
+  - name: Checking if cephadm is installed
+    shell: which cephadm
+    register: cephadm_Result
+    ignore_errors: true
+
+  - name: Displaying cephadm Result
+    debug:
+      var: cephadm_Result    
+
+  - name: Installing cephadm
+    shell: |
+      ./cephadm add-repo --release "{{ CEPH_RELEASE }}" 
+      ./cephadm install ceph-common -y 
+      ./cephadm install  
+    args:  
+      chdir: "{{ TEMP_CEPHADM_FOLDER }}"
+    when: cephadm_Result.stdout.find("/usr/sbin/cephadm") == -1        
+     
+

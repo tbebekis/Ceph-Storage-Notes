@@ -1,5 +1,6 @@
 - name: Preparation
   hosts: all
+  gather_facts: false
   tasks:
 
   # Python
@@ -28,13 +29,13 @@
   - name: Cecking Podman
     shell: podman -v
     register: Podman_Result
-    ignore_errors: yes 
+    ignore_errors: true 
   - name: Displaying Podman Result
     debug:
       var: Podman_Result
   - name: Installing Podman
     shell: apt-get install -y podman
-    when: Podman_Result.stdout.find("not found") != -1 
+    when: (Podman_Result is failed) or (Podman_Result.stdout.find("not found") != -1)
 
   # cephadm and ceph-common
   - name: Checking cephadm
