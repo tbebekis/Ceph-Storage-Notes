@@ -1,40 +1,43 @@
-  - name: Checking /tmp/cephadm folder
-    stat: 
-      path: "{{ TEMP_CEPHADM_FOLDER }}"
-    register: cephadm_temp_folder_Result
-    when: (cephadm_Result.stdout.find("not found") != -1)
-  - name: Creating /tmp/cephadm folder (if not exists)
-    file: 
-      path: "{{ TEMP_CEPHADM_FOLDER }}"
-      state: directory
-      mode: '0755'
+- name: Drain All Hosts
+  hosts: admin
+  gather_facts: false  
 
+  tasks:
 
-  - name: Installing cephadm
+  # check whether any daemons are still running
+  - name: Checking whether any daemons are still running on hosts (1st time)
     shell: |
-      curl --silent --remote-name --location https://github.com/ceph/ceph/tree/{{ CEPH_RELEASE }}/src/cephadm/cephadm  
+      cephadm shell -- ceph orch ps "{{ item }}"
+    register: Drain_Result
+    until: Drain_Result.stdout.find("No daemons reported") != -1
+    retries: 10
+    delay: 10
+    loop: "{{ groups['ceph_all'] }}"
 
-      chmod +x cephadm       
-
-      ./cephadm add-repo --release {{ CEPH_RELEASE }}  
-
-      ./cephadm install ceph-common  
-
-      ./cephadm install  
-    when: cephadm_Result.stdout.find("/usr/sbin/cephadm") == -1
-
-  # Ceph
-  - name: Cecking Ceph
-    shell: ceph -v
-    register: Ceph_Result
-    ignore_errors: true
-  - name: Displaying Ceph Result
+  # display result
+  - name: Displaying Drain_Result
     debug:
-      var: Ceph_Result
-  - name: Installing Ceph
+      var: Drain_Result 
+
+  # drain hosts conditionally
+  - name: Draining Hosts
     shell: |
-      wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
-      apt-get update
-      apt-get install -y ceph ceph-mds
-      ceph -v
-    when: (Ceph_Result is failed) or cephadm_Result.stdout.find("/usr/sbin/cephadm") == -1
+      cephadm shell -- ceph orch host drain "{{ item }}" --zap-osd-devices
+    loop: "{{ groups['ceph_all'] }}"
+    when: item.stdout.find("No daemons reported") == -1    
+
+  # AGAIN: check whether any daemons are still running 
+  - name: Checking whether any daemons are still running on hosts (2nc time)
+    shell: |
+      cephadm shell -- ceph orch ps "{{ item }}"
+    register: Drain_Result2
+    until: Drain_Result2.stdout.find("No daemons reported") != -1
+    retries: 10
+    delay: 10
+    loop: "{{ groups['ceph_all'] }}"
+
+  # display result
+  - name: Displaying Drain_Result2
+    debug:
+      var: Drain_Result2              
+ 

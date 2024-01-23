@@ -1,57 +1,68 @@
 - name: Preparation
-  hosts: all
+  hosts: ceph_all
+  vars:
+    CEPH_RELEASE: quincy  
+    TEMP_CEPHADM_FOLDER: /tmp/cephadm
   gather_facts: false
   tasks:
 
-  # Python
-  - name: Cecking Python3
-    shell: python3 --version
-    register: Python_Result
-  - name: Displaying Python Result
-    debug:
-      var: Python_Result
-  - name: Installing Python
-    shell: apt-get install -y python3
-    when: Python_Result.stdout.find("Python 3") == -1 
+  # -----------------------------------------------------------------------
+  #                      cephadm installation
+  # -----------------------------------------------------------------------
+  - name: Creating /tmp/cephadm folder (if not exists)
+    file: 
+      path: "{{ TEMP_CEPHADM_FOLDER }}"
+      state: directory
+      mode: '0755'
 
-  # lvm2
-  - name: Cecking lvm2
-    shell: lvm version
-    register: LVM_Result
-  - name: Displaying lvm2 Result
-    debug:
-      var: LVM_Result
-  - name: Installing lvm2
-    shell: apt-get install -y lvm2
-    when: LVM_Result.stdout.find("LVM version") == -1
+  - name: Checking if cephadm is already downloaded
+    stat: 
+      path: "{{ TEMP_CEPHADM_FOLDER }}/cephadm"
+    register: cephadm_Download_Result
 
-  # Podman
-  - name: Cecking Podman
-    shell: podman -v
-    register: Podman_Result
-    ignore_errors: true 
-  - name: Displaying Podman Result
-    debug:
-      var: Podman_Result
-  - name: Installing Podman
-    shell: apt-get install -y podman
-    when: (Podman_Result is failed) or (Podman_Result.stdout.find("not found") != -1)
+  - name: Downloading cephadm (if not already downloaded)
+    get_url:
+      url: https://raw.githubusercontent.com/ceph/ceph/{{ CEPH_RELEASE }}/src/cephadm/cephadm
+      dest: "{{ TEMP_CEPHADM_FOLDER }}/cephadm"
+      mode: '0755'
+    when: not cephadm_Download_Result.stat.exists     
 
-  # cephadm and ceph-common
-  - name: Checking cephadm
+  # cephadm, ceph-common
+  # the "cephadm version" has a bug, SEE: https://tracker.ceph.com/issues/59428
+  # so we use the location /usr/sbin/cephadm to check if cephadm is installed
+  - name: Checking if cephadm is installed
     shell: which cephadm
     register: cephadm_Result
+    ignore_errors: true
+
   - name: Displaying cephadm Result
     debug:
-      var: cephadm_Result
-  - name: Installing cephadm and ceph-common
-    vars:
-      CEPH_RELEASE: quincy
-    shell: |
-      curl --silent --remote-name --location https://github.com/ceph/ceph/tree/${CEPH_RELEASE}/src/cephadm/cephadm
+      var: cephadm_Result    
 
-      chmod +x cephadm              
-      ./cephadm add-repo --release {{ CEPH_RELEASE }}
-      ./cephadm install
-      ./cephadm install ceph-common
-    when: cephadm_Result.stdout.find("/usr/sbin/cephadm") == -1
+  - name: Installing cephadm
+    shell: |
+      ./cephadm add-repo --release "{{ CEPH_RELEASE }}" 
+      ./cephadm install ceph-common -y 
+      ./cephadm install  
+    args:  
+      chdir: "{{ TEMP_CEPHADM_FOLDER }}"
+    when: cephadm_Result.stdout.find("/usr/sbin/cephadm") == -1        
+     
+
+  # -----------------------------------------------------------------------
+  #                      Ceph installation
+  # -----------------------------------------------------------------------
+  - name: Cecking Ceph is installed
+    shell: ceph -v
+    register: Ceph_Result
+    ignore_errors: true
+
+  - name: Displaying Ceph Result
+    debug:
+      var: Ceph_Result
+
+  - name: Installing Ceph
+    shell: |
+      apt-get install -y ceph
+      ceph -v
+    when: (Ceph_Result is failed) or Ceph_Result.stdout.find("not found") != -1

@@ -8,7 +8,7 @@
       shell: ceph mgr module disable cephadm
 
 - name: Remove Cluster
-  hosts: all
+  hosts: ceph_all
   gather_facts: false
   tasks:
   - name: Getting FSID

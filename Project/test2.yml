@@ -1,0 +1,9 @@
+- name: Drain All Hosts
+  hosts: admin
+  gather_facts: false  
+
+  tasks:
+
+  - name: Draining Hosts
+    shell: echo {{ item }}
+    loop: "{{ groups['ceph_all'] }}"

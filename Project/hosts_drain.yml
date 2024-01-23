@@ -1,24 +1,55 @@
 - name: Drain All Hosts
   hosts: admin
   gather_facts: false  
+  vars:
+    LoopArray: "{{ groups['one'] }}"  # groups['ceph_all']
+
+    # SEE: https://serverfault.com/a/1109890
+    # convert Drain_Result.results to an array of objects { "stdout": "No daemons reported"}
+    StdOut_Array: "{{ Drain_Result.results | json_query('[].{stdout: stdout}') }}"
+    # create a Dictionary where each entry has Key the IP Address and Value the Stdout element from above 
+    #   "10.80.80.81": { "stdout": "No daemons reported" }
+    HostDic: "{{ dict(LoopArray|zip(StdOut_Array)) }}"
 
   tasks:
 
-  - name: Draining Hosts
-    shell: ceph orch host drain "{{ item }}" --zap-osd-devices
-    loop: "{{ groups[all] }}"
-
-  - name: Checking whether any daemons are still running on hosts
-    shell: ceph orch ps "{{ item }}"
+  # check whether any daemons are still running
+  - name: Checking whether any daemons are still running on hosts (1st time)
+    shell: cephadm shell -- ceph orch ps "{{ item }}"
     register: Drain_Result
     until: Drain_Result.stdout.find("No daemons reported") != -1
     retries: 10
     delay: 10
-    loop: "{{ groups[all] }}"
+    loop: "{{ LoopArray }}" 
+
+  - name: Displaying HostDic
+    debug:
+      var: HostDic 
+             
+  # drain hosts conditionally
+  - name: Draining Hosts
+    shell: cephadm shell -- ceph orch host drain "{{ item }}" --zap-osd-devices
+    loop: "{{ LoopArray }}"
+    when: HostDic[item].stdout.find("No daemons reported") != -1    # HostDic[item].stdout != "No daemons reported"
+    ignore_errors: true
+
+  # AGAIN: check whether any daemons are still running 
+  - name: Checking whether any daemons are still running on hosts (2nc time)
+    shell: cephadm shell -- ceph orch ps "{{ item }}"
+    register: Drain_Result2
+    until: Drain_Result2.stdout.find("No daemons reported") != -1
+    retries: 10
+    delay: 10
+    loop: "{{ LoopArray }}"
+
+  # display result
+  - name: Displaying Drain_Result2
+    debug:
+      var: Drain_Result2        
 
   - name: Checking OSD removal status
-    shell: ceph orch osd rm status
+    shell: cephadm shell -- ceph orch osd rm status
     register: OSD_Removal_Result
     until: OSD_Removal_Result.stdout.find("No OSD remove/replace operations reported") != -1
     retries: 10
-    delay: 10
+    delay: 10      

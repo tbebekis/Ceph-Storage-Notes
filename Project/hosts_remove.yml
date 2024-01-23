@@ -4,4 +4,4 @@
   tasks:
   - name: Removing a Host
     shell: ceph orch host rm "{{ item }}" --force
-    loop: "{{ groups[all] }}"
+    loop: "{{ groups['ceph_all'] }}"

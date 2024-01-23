@@ -1,0 +1,19 @@
+# the following procedure is the correct way to remove a host
+
+# login to cephadm shell
+cephadm shell
+
+# fetch the host details
+ceph orch host ls
+
+# drain all the daemons from the host
+ceph orch host drain HOSTNAME
+
+# check the status of OSD removal
+ceph orch osd rm status
+
+# check if all the daemons are removed from the storage cluster
+ceph orch ps HOSTNAME
+
+# When no placement groups (PG) are left on the OSD, the OSD is decommissioned and removed from the storage cluster
+# ceph orch host rm HOSTNAME
